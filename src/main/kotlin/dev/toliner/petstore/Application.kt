@@ -1,6 +1,6 @@
 package dev.toliner.petstore
 
-import dev.toliner.petstore.plugins.configureDatabases
+import dev.toliner.petstore.repository.configureDatabases
 import dev.toliner.petstore.plugins.configureMonitoring
 import dev.toliner.petstore.plugins.configureRouting
 import dev.toliner.petstore.plugins.configureSerialization

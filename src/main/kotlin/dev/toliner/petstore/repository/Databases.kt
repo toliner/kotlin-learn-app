@@ -1,8 +1,11 @@
-package dev.toliner.petstore.plugins
+package dev.toliner.petstore.repository
 
 import io.ktor.server.application.Application
+import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.koin.core.module.Module
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 fun Application.configureDatabases() : Module {
@@ -15,5 +18,10 @@ fun Application.configureDatabases() : Module {
     )
     return module {
         single { database }
+        single { UserRepositoryImpl(get()) }.bind(UserRepository::class)
     }
 }
+
+class NameConflictException internal constructor() : RuntimeException()
+
+internal suspend fun <T> Database.query(block: suspend () -> T): T = newSuspendedTransaction(Dispatchers.IO, this) { block() }
