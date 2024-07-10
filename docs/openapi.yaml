@@ -1,0 +1,350 @@
+openapi: 3.0.3
+info:
+  title: Kotlin Petstore API
+  description: |
+    Kotlin Petstoreは、新進気鋭の電子ペット店です。
+    ペットは全て電子上に存在し、ユーザーはペットを閲覧・購入・育成できます。
+    Kotlin Petstoreは電子上に存在するため、あらゆる取引やペットとの関わりは全てこのAPI上で行われます。
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /user:
+    post:
+      summary: ユーザーの作成
+      description: |
+        ユーザーを作成します。ユーザーの種類はcustomerかemployeeのいずれかです。
+        ユーザーのIDは自動で割り振られます。
+      operationId: createUser
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: ユーザーの表示名
+                type:
+                  $ref: "#/components/schemas/UserType"
+      responses:
+        201:
+          description: ユーザーの作成に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        409:
+          description: その名前のユーザーは既に存在します
+        default:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /user/{userId}:
+    put:
+      summary: ユーザー名の更新
+      tags:
+        - user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: 更新対象のユーザーのID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: 新しいユーザーの表示名
+      responses:
+        200:
+          description: ユーザーの更新に成功
+        404:
+          description: 該当ユーザーが存在しない
+        default:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      summary: 特定のユーザーの情報を表示
+      description: |
+        特定のユーザーの情報を表示します。
+      operationId: getUserById
+      tags:
+        - user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: 情報を取得したいユーザーのID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 正常なレスポンスに対する予期するレスポンス
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        404:
+          description: 該当するIDのユーザーが見つからない場合
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+        default:
+          description: 予期せぬのエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /pets:
+    get:
+      summary: ペットの一覧を取得
+      description: |
+        ペットの一覧を取得します。ページネーションが可能で、limitとpageを指定することで取得するペットの範囲を指定できます。
+        ペットはIDの昇順にソートされています。
+        また、特定の状態のペットだけを取得することもできます。
+        返される値に、必須で無い値は全て含まれません。
+      operationId: listPets
+      tags:
+        - pets
+      parameters:
+        - name: limit
+          in: query
+          description: 1度のリクエストで何個のペットを返すか (1-100)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            format: int32
+        - name: status
+          in: query
+          description: ペットの状態
+          required: false
+          schema:
+            $ref: "#/components/schemas/PetStatus"
+        - name: page
+          in: query
+          description: ページ番号。1ページあたりlimit個のペットが返される。ページ内のペットは[(page-1)\*limit, page\*limit)の範囲になる。
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            format: int32
+      responses:
+        '200':
+          description: 1ページ分のペットの一覧
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pets"
+        default:
+          description: 予期しないエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: ペットの入荷
+      description:
+        statusは、nullの場合はin_stockとして扱われます。
+        また、soldの場合は無視され、in_stockとして扱われます。
+      operationId: createPets
+      tags:
+        - pets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: ペットの名前
+                tag:
+                  type: array
+                  items:
+                    type: string
+                  description: ペットのタグ
+                status:
+                  $ref: "#/components/schemas/PetStatus"
+        required: true
+      responses:
+        '201':
+          description: ペットの作成に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        409:
+          description: その名前のペットは既に存在します
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pets/{petId}:
+    get:
+      summary: 特定のペットの情報を表示
+      description: |
+        特定のペットの情報を表示します。
+        返される値に、必須で無い値も全て含まれます。
+      operationId: showPetById
+      tags:
+        - pets
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          description: 情報を取得したいペットのID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 正常なレスポンスに対する予期するレスポンス
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        404:
+          description: 該当するIDのペットが見つからない場合
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+        default:
+          description: 予期せぬのエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: ペットの情報を更新
+      description: |
+        ペットの情報を更新します。
+      operationId: updatePet
+      tags:
+        - pets
+      requestBody:
+        required: true
+        description: 更新するペットの情報
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pet"
+      responses:
+        '200':
+          description: ペットの更新に成功
+        default:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - type
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ユーザーの一意なID。不変。
+          minimum: 0
+        username:
+          type: string
+          description: ユーザーの一意な表示名。可変。
+          maxLength: 50
+        type:
+          $ref: '#/components/schemas/UserType'
+    UserType:
+      type: string
+      enum:
+        - customer
+        - employee
+      description: "ユーザーの種類。customerは一般ユーザー、employeeは従業員。"
+    Pet:
+      type: object
+      required:
+        - id
+        - name
+        - status
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ペットの一意なID。不変。
+          minimum: 0
+        name:
+          type: string
+          description: ペットの名前。可変。
+          maxLength: 50
+        tag:
+          type: array
+          items:
+            type: string
+            maxLength: 50
+          description: ペットのタグ。ペットの種類や情報が入る。可変。
+        status:
+          $ref: "#/components/schemas/PetStatus"
+        owner:
+          $ref: "#/components/schemas/User"
+    PetStatus:
+      type: string
+      enum:
+        - in_stock
+        - sold
+        - not_for_sale
+      description: "ペットの状態。in_stockは在庫あり、soldは売却済み、not_for_saleは販売不可。"
+    Pets:
+      type: array
+      maxItems: 100
+      items:
+        $ref: "#/components/schemas/Pet"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: エラーコード
+        message:
+          type: string
+          description: エラーメッセージ
+    NotFoundResponse:
+      type: string
+      description: ランダムなメッセージ
+      enum:
+        - ざっこ〜♥
+        - よっわ♥
+        - むりむり♥
+        - だっさ〜♥
+        - カッコわる〜♥

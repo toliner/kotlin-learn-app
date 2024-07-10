@@ -3,12 +3,20 @@ services:
     image: mysql:8
     container_name: mysql
     ports:
-    - "3306:3306"
+    - "127.0.0.1:3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db
+      MYSQL_DATABASE: training
       MYSQL_USER: train
       MYSQL_PASSWORD: password
+    volumes:
+      - mysql_data:/var/lib/mysql
+  apidoc:
+    image: nginx:latest
+    ports:
+      - 127.0.0.1:3000:80
+    volumes:
+      - ./docs:/usr/share/nginx/html
 
 volumes:
   mysql_data:
