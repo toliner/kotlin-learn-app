@@ -1,4 +1,4 @@
-package dev.toliner.plugins
+package dev.toliner.petstore.plugins
 
 import io.ktor.server.application.*
 import io.ktor.server.plugins.callloging.*

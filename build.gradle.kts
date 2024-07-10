@@ -15,7 +15,7 @@ version = "0.0.1"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 
-    val isDevelopment: Boolean = project.ext.has("development")
+    val isDevelopment: Boolean = project.ext.has("development") || System.getenv("DEVELOPMENT")?.toBoolean() ?: false
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
@@ -32,9 +32,13 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
-    implementation("com.h2database:h2:$h2_version")
+    implementation("com.mysql:mysql-connector-j:8.4.0")
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    implementation(platform("io.insert-koin:koin-bom:3.5.6"))
+    implementation("io.insert-koin:koin-core")
+    implementation("io.insert-koin:koin-ktor")
+    implementation("io.insert-koin:koin-logger-slf4j")
 }

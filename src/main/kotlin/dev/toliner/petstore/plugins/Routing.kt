@@ -1,4 +1,4 @@
-package dev.toliner.plugins
+package dev.toliner.petstore.plugins
 
 import io.ktor.http.*
 import io.ktor.server.application.*

@@ -1,4 +1,4 @@
-package dev.toliner.plugins
+package dev.toliner.petstore.repository
 
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction

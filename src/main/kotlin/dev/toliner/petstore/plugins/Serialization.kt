@@ -1,4 +1,4 @@
-package dev.toliner.plugins
+package dev.toliner.petstore.plugins
 
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
