@@ -254,10 +254,64 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Pet"
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ペットの名前
+                tag:
+                  type: array
+                  items:
+                    type: string
+                    description: ペットのタグ
       responses:
         '200':
           description: ペットの更新に成功
+        default:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pets/buy:
+    post:
+      summary: ペットの購入
+      description: |
+        ペットを購入します。ペットの状態がsoldに変更されます。
+      operationId: buyPet
+      tags:
+        - pets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - petId
+                - ownerId
+              properties:
+                petId:
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  description: 購入するペットのID
+                ownerId:
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  description: ペットの購入者のID
+      responses:
+        200:
+          description: ペットの購入に成功
+        400:
+          description: ペットが非売品の場合
+        404:
+          description: 該当するIDのペットが見つからない場合
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
         default:
           description: 予期せぬエラー
           content:
