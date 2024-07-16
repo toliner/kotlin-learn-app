@@ -19,6 +19,7 @@ fun Application.configureDatabases() : Module {
     return module {
         single { database }
         single { UserRepositoryImpl(get()) }.bind(UserRepository::class)
+        single { PetRepositoryImpl(get()) }.bind(PetRepository::class)
     }
 }
 

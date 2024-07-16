@@ -1,6 +1,7 @@
 package dev.toliner.petstore.repository
 
 import dev.toliner.petstore.model.User
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -17,12 +18,9 @@ interface UserRepository {
 internal class UserRepositoryImpl(
     private val db: Database,
 ) : UserRepository {
-    private object Users : Table() {
-        val id = long("id").autoIncrement()
+    internal object Users : LongIdTable() {
         val name = varchar("name", length = 50).uniqueIndex()
         val type = enumeration("type", User.Type::class)
-
-        override val primaryKey: PrimaryKey = PrimaryKey(id)
     }
 
     init {
@@ -43,7 +41,7 @@ internal class UserRepositoryImpl(
             }
         }
         return User(
-            newUser[Users.id],
+            newUser[Users.id].value,
             newUser[Users.name],
             newUser[Users.type]
         )
@@ -55,7 +53,7 @@ internal class UserRepositoryImpl(
                 .asIterable()
                 .map {
                     User(
-                        it[Users.id],
+                        it[Users.id].value,
                         it[Users.name],
                         it[Users.type]
                     )
@@ -70,7 +68,7 @@ internal class UserRepositoryImpl(
                 .asIterable()
                 .map {
                     User(
-                        it[Users.id],
+                        it[Users.id].value,
                         it[Users.name],
                         it[Users.type]
                     )

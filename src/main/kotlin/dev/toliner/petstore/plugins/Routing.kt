@@ -1,5 +1,6 @@
 package dev.toliner.petstore.plugins
 
+import dev.toliner.petstore.route.routePet
 import dev.toliner.petstore.route.routeUser
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -42,6 +43,7 @@ fun Application.configureRouting() {
             call.respondText("Hello World!")
         }
         routeUser()
+        routePet()
     }
 }
 

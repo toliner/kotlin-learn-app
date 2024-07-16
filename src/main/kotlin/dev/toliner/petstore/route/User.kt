@@ -1,7 +1,7 @@
 package dev.toliner.petstore.route
 
 import dev.toliner.petstore.model.User
-import dev.toliner.petstore.plugins.getWrondIdResponse
+import dev.toliner.petstore.plugins.getWrongIdResponse
 import dev.toliner.petstore.plugins.respondNotFound
 import dev.toliner.petstore.repository.UserRepository
 import io.ktor.http.HttpStatusCode
