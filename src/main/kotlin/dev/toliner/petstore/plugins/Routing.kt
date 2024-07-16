@@ -50,8 +50,8 @@ private val wrongIdResponse = setOf(
 )
 
 @Suppress("UnusedReceiverParameter")
-fun PipelineContext<*, ApplicationCall>.getWrondIdResponse() = wrongIdResponse.random()
+fun PipelineContext<*, ApplicationCall>.getWrongIdResponse() = wrongIdResponse.random()
 
 suspend fun PipelineContext<*, ApplicationCall>.respondNotFound() {
-    call.respond(HttpStatusCode.NotFound, getWrondIdResponse())
+    call.respond(HttpStatusCode.NotFound, getWrongIdResponse())
 }

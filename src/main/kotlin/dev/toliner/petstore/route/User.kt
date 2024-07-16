@@ -33,14 +33,14 @@ fun Routing.routeUser() = route("user") {
         get {
             val userId = call.parameters["userId"]?.toLongOrNull()
             if (userId == null) {
-                call.respond(HttpStatusCode.NotFound, getWrondIdResponse())
+                call.respond(HttpStatusCode.NotFound, getWrongIdResponse())
                 return@get
             }
             val user = repository.findById(userId)
             if (user != null) {
                 call.respond(user)
             } else {
-                call.respond(HttpStatusCode.NotFound, getWrondIdResponse())
+                call.respond(HttpStatusCode.NotFound, getWrongIdResponse())
             }
         }
 
